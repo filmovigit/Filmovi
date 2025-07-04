@@ -1,433 +1,378 @@
-// Enhanced TV Movies Interface Script
+// Modular Smart TV Streaming Site Script
+// Author: AI Refactor for Netflix-style, TV-friendly UI
+// ---
+
 document.addEventListener('DOMContentLoaded', function() {
+    // --- CONFIG: Add your movies/series here ---
+    const CONTENT = [
+        // --- 2025 Releases ---
+        {
+            id: '101',
+            title: "Wake Up Dead Man: A Knives Out Mystery",
+            url: "wake-up-dead-man-a-knives-out-mystery",
+            genre: "Crime",
+            category: "Movies",
+            year: 2025,
+            description: "Detective Benoit Blanc returns to solve another mind-bending mystery.",
+            poster: "",
+            featured: true
+        },
+        {
+            id: '102',
+            title: "Troll 2",
+            url: "troll-2-2025",
+            genre: "Science Fiction",
+            category: "Movies",
+            year: 2025,
+            description: "The trolls are back in this Norwegian fantasy adventure.",
+            poster: "",
+            featured: false
+        },
+        {
+            id: '103',
+            title: "Happy Gilmore 2",
+            url: "happy-gilmore-2",
+            genre: "Comedy",
+            category: "Movies",
+            year: 2025,
+            description: "Adam Sandler returns in the hilarious sequel to the golf classic.",
+            poster: "",
+            featured: false
+        },
+        {
+            id: '104',
+            title: "The Old Guard 2",
+            url: "the-old-guard-2",
+            genre: "Superhero",
+            category: "Movies",
+            year: 2025,
+            description: "The immortal warriors return for another action-packed adventure.",
+            poster: "",
+            featured: false
+        },
+        {
+            id: '105',
+            title: "My Oxford Year",
+            url: "my-oxford-year",
+            genre: "Romance",
+            category: "Movies",
+            year: 2025,
+            description: "A heartfelt romance set in the historic halls of Oxford.",
+            poster: "",
+            featured: false
+        },
+        {
+            id: '106',
+            title: "Z-O-M-B-I-E-S 4: Dawn of the Vampires",
+            url: "z-o-m-b-i-e-s-4-dawn-of-the-vampires",
+            genre: "Comedy",
+            category: "Family",
+            year: 2025,
+            description: "The musical monster franchise continues with a new supernatural twist.",
+            poster: "",
+            featured: false
+        },
+        {
+            id: '107',
+            title: "Dora and the Search for Sol Dorado",
+            url: "dora-and-the-search-for-sol-dorado",
+            genre: "Family",
+            category: "Family",
+            year: 2025,
+            description: "Dora embarks on a new adventure to find the legendary city of gold.",
+            poster: "",
+            featured: false
+        },
+        {
+            id: '108',
+            title: "Gladiator II",
+            url: "gladiator-ii",
+            genre: "Action",
+            category: "Movies",
+            year: 2024,
+            description: "The epic saga continues in ancient Rome.",
+            poster: "",
+            featured: false
+        },
+        {
+            id: '109',
+            title: "Echo Valley",
+            url: "echo-valley",
+            genre: "Thriller",
+            category: "Movies",
+            year: 2025,
+            description: "A suspenseful thriller set in the mysterious Echo Valley.",
+            poster: "",
+            featured: false
+        },
+        // --- TV Shows ---
+        {
+            id: '201',
+            title: "What We Do in the Shadows",
+            url: "what-we-do-in-the-shadows",
+            genre: "Comedy",
+            category: "Series",
+            year: 2019,
+            description: "A mockumentary about vampire roommates navigating modern life.",
+            poster: "",
+            featured: false
+        },
+        {
+            id: '202',
+            title: "Law & Order: Special Victims Unit",
+            url: "law-and-order-special-victims-unit",
+            genre: "Crime",
+            category: "Series",
+            year: 1999,
+            description: "The long-running crime drama following NYPD's Special Victims Unit.",
+            poster: "",
+            featured: false
+        },
+        {
+            id: '203',
+            title: "Tatort",
+            url: "tatort",
+            genre: "Crime",
+            category: "Series",
+            year: 1970,
+            description: "A German anthology series following homicide detectives.",
+            poster: "",
+            featured: false
+        },
+        // --- Add more as needed ---
+    ];
+
+    // --- Utility: Get unique categories ---
+    function getCategories() {
+        const cats = new Set(CONTENT.map(item => item.category));
+        return Array.from(cats);
+    }
+
+    // --- Utility: Get featured item ---
+    function getFeatured() {
+        return CONTENT.find(item => item.featured) || CONTENT[0];
+    }
+
+    // --- Utility: Get items by category ---
+    function getByCategory(cat) {
+        return CONTENT.filter(item => item.category === cat);
+    }
+
+    // --- Utility: Get item by ID ---
+    function getById(id) {
+        return CONTENT.find(item => item.id === id);
+    }
+
+    // --- Utility: Watch progress (localStorage) ---
+    function getProgress(id) {
+        return parseFloat(localStorage.getItem('progress_' + id)) || 0;
+    }
+    function setProgress(id, value) {
+        localStorage.setItem('progress_' + id, value);
+    }
+
+    // --- Render Hero Section ---
+    function renderHero() {
+        const hero = document.getElementById('hero');
+        const featured = getFeatured();
+        hero.innerHTML = `
+            <div class="hero-content">
+                <div class="hero-title">${featured.title}</div>
+                <div class="hero-meta">${featured.genre} • ${featured.year}</div>
+                <div class="hero-desc">${featured.description}</div>
+                <button class="hero-play-btn" tabindex="0" data-play-id="${featured.id}">▶ Play</button>
+            </div>
+        `;
+    }
+
+    // --- Render Categories & Grids ---
+    function renderCategories() {
+        const container = document.getElementById('content-categories');
+        container.innerHTML = '';
+        getCategories().forEach(cat => {
+            const items = getByCategory(cat);
+            const block = document.createElement('div');
+            block.className = 'category-block';
+            block.innerHTML = `
+                <div class="category-title">${cat}</div>
+                <div class="category-list" role="list">
+                    ${items.map(item => `
+                        <div class="movie-item" tabindex="0" data-movie-id="${item.id}" role="listitem">
+                            <div class="movie-poster">${item.poster ? `<img src="${item.poster}" alt="${item.title} poster" style="width:100%;height:100%;object-fit:cover;border-radius:12px 12px 0 0;">` : '🎬'}</div>
+                            <div class="movie-title">${item.title}</div>
+                            <div class="movie-progress" style="width:${getProgress(item.id) * 100}%;display:${getProgress(item.id) > 0 ? 'block' : 'none'}"></div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+            container.appendChild(block);
+        });
+    }
+
+    // --- Focus Management ---
+    function getFocusable() {
+        return document.querySelectorAll('[tabindex="0"]');
+    }
     let currentFocus = 0;
-    const focusableElements = document.querySelectorAll('[tabindex="0"]');
-    
-    // Movie database with vidfast.net integration
-    const movies = {
-        1: { title: "Action Hero", url: "action-hero-2024", genre: "Action" },
-        2: { title: "Adventure Quest", url: "adventure-quest-2024", genre: "Adventure" },
-        3: { title: "Comedy Gold", url: "comedy-gold-2024", genre: "Comedy" },
-        4: { title: "Drama Special", url: "drama-special-2024", genre: "Drama" },
-        5: { title: "Thriller Night", url: "thriller-night-2024", genre: "Thriller" },
-        6: { title: "Romance Story", url: "romance-story-2024", genre: "Romance" }
-    };
-
-    // Initialize focus management
-    initializeFocus();
-    
-    // Set up event listeners
-    setupEventListeners();
-    
-    // Initialize focus on first element
     function initializeFocus() {
-        if (focusableElements.length > 0) {
-            focusableElements[currentFocus].focus();
-            console.log('TV Interface initialized with', focusableElements.length, 'focusable elements');
-        }
-    }
-
-    // Setup all event listeners
-    function setupEventListeners() {
-        // Keyboard navigation
-        document.addEventListener('keydown', handleKeyNavigation);
-        
-        // Click handlers
-        document.getElementById('search-button').addEventListener('click', performSearch);
-        document.getElementById('close-video').addEventListener('click', closeVideo);
-        
-        // Search input enter key
-        document.getElementById('search-input').addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                performSearch();
-            }
-        });
-
-        // Focus management for all focusable elements
-        focusableElements.forEach((element, index) => {
-            element.addEventListener('focus', () => {
-                currentFocus = index;
-                console.log('Focus changed to element', index);
-            });
-            
-            // Add click handlers for movie items
-            if (element.classList.contains('movie-item')) {
-                element.addEventListener('click', function() {
-                    const movieId = this.getAttribute('data-movie-id');
-                    playMovie(movieId);
-                });
-            }
-        });
-    }
-
-    // Enhanced keyboard navigation for TV remote
-    function handleKeyNavigation(event) {
-        const activeElement = document.activeElement;
-        let handled = false;
-        
-        switch(event.key) {
-            case 'ArrowLeft':
-                event.preventDefault();
-                navigateLeft();
-                handled = true;
-                break;
-                
-            case 'ArrowRight':
-                event.preventDefault();
-                navigateRight();
-                handled = true;
-                break;
-                
-            case 'ArrowUp':
-                event.preventDefault();
-                navigateUp();
-                handled = true;
-                break;
-                
-            case 'ArrowDown':
-                event.preventDefault();
-                navigateDown();
-                handled = true;
-                break;
-                
-            case 'Enter':
-                event.preventDefault();
-                handleEnterKey(activeElement);
-                handled = true;
-                break;
-                
-            case 'Escape':
-                event.preventDefault();
-                closeVideo();
-                handled = true;
-                break;
-                
-            case 'Backspace':
-                event.preventDefault();
-                goBack();
-                handled = true;
-                break;
-        }
-        
-        if (handled) {
-            // Update currentFocus based on actual focused element
-            const focusedIndex = Array.from(focusableElements).indexOf(document.activeElement);
-            if (focusedIndex !== -1) {
-                currentFocus = focusedIndex;
-            }
-        }
-    }
-
-    // Navigation functions
-    function navigateLeft() {
-        if (currentFocus > 0) {
-            currentFocus--;
-            focusableElements[currentFocus].focus();
-        }
-    }
-
-    function navigateRight() {
-        if (currentFocus < focusableElements.length - 1) {
-            currentFocus++;
-            focusableElements[currentFocus].focus();
-        }
-    }
-
-    function navigateUp() {
-        // Smart grid navigation - move up in the current section
-        const currentElement = focusableElements[currentFocus];
-        const currentSection = getCurrentSection(currentElement);
-        
-        if (currentSection === 'navbar') {
-            // Stay in navbar
-            return;
-        } else if (currentSection === 'movies') {
-            // Move to navbar
+        const focusable = getFocusable();
+        if (focusable.length > 0) {
+            focusable[0].focus();
             currentFocus = 0;
-            focusableElements[currentFocus].focus();
-        } else if (currentSection === 'search') {
-            // Move to movies section
-            const movieElements = document.querySelectorAll('.movie-item[tabindex="0"]');
-            if (movieElements.length > 0) {
-                const movieIndex = Array.from(focusableElements).indexOf(movieElements[movieElements.length - 1]);
-                if (movieIndex !== -1) {
-                    currentFocus = movieIndex;
-                    focusableElements[currentFocus].focus();
-                }
+        }
+    }
+
+    // --- Navigation Logic (TV Remote) ---
+    function setupNavigation() {
+        document.addEventListener('keydown', function(event) {
+            const focusable = Array.from(getFocusable());
+            let handled = false;
+            switch(event.key) {
+                case 'ArrowLeft':
+                    if (currentFocus > 0) {
+                        currentFocus--;
+                        focusable[currentFocus].focus();
+                    }
+                    handled = true;
+                    break;
+                case 'ArrowRight':
+                    if (currentFocus < focusable.length - 1) {
+                        currentFocus++;
+                        focusable[currentFocus].focus();
+                    }
+                    handled = true;
+                    break;
+                case 'ArrowUp':
+                case 'ArrowDown':
+                    // Try to move up/down by row in grid
+                    // For simplicity, just move -4/+4 (assuming 4 per row)
+                    const perRow = 4;
+                    if (event.key === 'ArrowUp' && currentFocus - perRow >= 0) {
+                        currentFocus -= perRow;
+                        focusable[currentFocus].focus();
+                        handled = true;
+                    } else if (event.key === 'ArrowDown' && currentFocus + perRow < focusable.length) {
+                        currentFocus += perRow;
+                        focusable[currentFocus].focus();
+                        handled = true;
+                    }
+                    break;
+                case 'Enter':
+                    focusable[currentFocus].click();
+                    handled = true;
+                    break;
+                case 'Escape':
+                    closePlayer();
+                    handled = true;
+                    break;
             }
-        }
+            if (handled) event.preventDefault();
+        });
     }
 
-    function navigateDown() {
-        const currentElement = focusableElements[currentFocus];
-        const currentSection = getCurrentSection(currentElement);
-        
-        if (currentSection === 'navbar') {
-            // Move to movies section
-            const movieElements = document.querySelectorAll('.movie-item[tabindex="0"]');
-            if (movieElements.length > 0) {
-                const movieIndex = Array.from(focusableElements).indexOf(movieElements[0]);
-                if (movieIndex !== -1) {
-                    currentFocus = movieIndex;
-                    focusableElements[currentFocus].focus();
-                }
+    // --- Event Delegation for Play/Select ---
+    function setupEventDelegation() {
+        document.body.addEventListener('click', function(e) {
+            const playBtn = e.target.closest('[data-play-id]');
+            if (playBtn) {
+                playMovie(playBtn.getAttribute('data-play-id'));
+                return;
             }
-        } else if (currentSection === 'movies') {
-            // Move to search section
-            const searchInput = document.getElementById('search-input');
-            const searchIndex = Array.from(focusableElements).indexOf(searchInput);
-            if (searchIndex !== -1) {
-                currentFocus = searchIndex;
-                focusableElements[currentFocus].focus();
+            const movieItem = e.target.closest('.movie-item');
+            if (movieItem) {
+                playMovie(movieItem.getAttribute('data-movie-id'));
+                return;
             }
-        }
-        // If in search, stay in search
+            const closeBtn = e.target.closest('#close-video');
+            if (closeBtn) {
+                closePlayer();
+                return;
+            }
+        });
     }
 
-    // Get current section of focused element
-    function getCurrentSection(element) {
-        if (element.closest('.navbar')) return 'navbar';
-        if (element.closest('.content-categories')) return 'movies';
-        if (element.closest('.search')) return 'search';
-        return 'other';
-    }
-
-    // Handle Enter key press
-    function handleEnterKey(element) {
-        console.log('Enter pressed on:', element);
-        
-        if (element.classList.contains('movie-item')) {
-            const movieId = element.getAttribute('data-movie-id');
-            playMovie(movieId);
-        } else if (element.id === 'search-button') {
-            performSearch();
-        } else if (element.id === 'close-video') {
-            closeVideo();
-        } else if (element.getAttribute('data-section')) {
-            navigateToSection(element.getAttribute('data-section'));
-        } else if (element.id === 'search-input') {
-            performSearch();
-        }
-    }
-
-    // Play movie using vidfast.net API
-    function playMovie(movieId) {
-        const movie = movies[movieId];
-        if (!movie) {
-            console.error('Movie not found:', movieId);
-            return;
-        }
-        
-        console.log('Playing movie:', movie.title);
+    // --- Video Player Logic (VIDFAST embed) ---
+    function playMovie(id) {
+        const item = getById(id);
+        if (!item) return;
         showLoading();
-        
-        // Construct vidfast.net stream URL
-        const streamUrl = `https://vidfast.net/embed/${movie.url}`;
-        
-        // Simulate loading time
         setTimeout(() => {
             hideLoading();
-            
             const videoContainer = document.getElementById('video-container');
-            const videoPlayer = document.getElementById('video-player');
-            
-            // Hide default video player
-            videoPlayer.style.display = 'none';
-            
-            // Create or update iframe for vidfast.net player
-            let iframe = document.getElementById('stream-iframe');
-            if (!iframe) {
-                iframe = document.createElement('iframe');
-                iframe.id = 'stream-iframe';
-                iframe.style.width = '100%';
-                iframe.style.height = '100%';
-                iframe.style.border = 'none';
-                iframe.allowFullscreen = true;
-                iframe.setAttribute('allow', 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture');
-                videoContainer.appendChild(iframe);
-            }
-            
-            // Set the stream URL
-            iframe.src = streamUrl;
-            
-            // Show video container
-            videoContainer.style.display = 'block';
-            
-            // Focus on close button for easy exit
+            videoContainer.innerHTML = `<button class="close-button" id="close-video" tabindex="0" aria-label="Close player">✕ Close</button><iframe id="stream-iframe" src="https://vidfast.net/embed/${item.url}" allowfullscreen allow="autoplay; encrypted-media" style="width:90vw;height:60vh;max-width:1200px;max-height:80vh;border-radius:16px;background:#000;"></iframe>`;
+            videoContainer.style.display = 'flex';
             document.getElementById('close-video').focus();
-            
-            console.log('Movie player opened:', streamUrl);
-        }, 1500);
-    }
-
-    // Enhanced search functionality
-    function performSearch() {
-        const searchTerm = document.getElementById('search-input').value.trim();
-        if (!searchTerm) {
-            alert('Please enter a search term');
-            document.getElementById('search-input').focus();
-            return;
-        }
-        
-        console.log('Searching for:', searchTerm);
-        showLoading();
-        
-        // Simulate search with vidfast.net API
-        setTimeout(() => {
-            hideLoading();
-            
-            // In a real implementation, you would make an API call to vidfast.net
-            const searchResults = simulateSearch(searchTerm);
-            
-            if (searchResults.length > 0) {
-                displaySearchResults(searchResults);
-            } else {
-                alert(`No results found for "${searchTerm}"\n\nTry searching for: Action, Comedy, Drama, Thriller, Romance`);
-            }
+            // Track watch progress (simulate: set to 0.5 for demo)
+            setProgress(id, 0.5); // In real use, update as user watches
+            renderCategories(); // Update progress bars
         }, 1000);
     }
-
-    // Simulate search results
-    function simulateSearch(term) {
-        const results = [];
-        const lowerTerm = term.toLowerCase();
-        
-        Object.values(movies).forEach(movie => {
-            if (movie.title.toLowerCase().includes(lowerTerm) || 
-                movie.genre.toLowerCase().includes(lowerTerm)) {
-                results.push(movie);
-            }
-        });
-        
-        return results;
-    }
-
-    // Display search results
-    function displaySearchResults(results) {
-        const resultsText = results.map(movie => `${movie.title} (${movie.genre})`).join('\n');
-        alert(`Search Results:\n\n${resultsText}\n\nPress Enter on any movie to play it!`);
-    }
-
-    // Navigation between sections
-    function navigateToSection(section) {
-        console.log('Navigating to section:', section);
-        
-        const sections = {
-            'home': () => {
-                window.scrollTo(0, 0);
-                focusableElements[0].focus();
-            },
-            'movies': () => {
-                document.querySelector('.content-categories').scrollIntoView();
-                const movieElements = document.querySelectorAll('.movie-item[tabindex="0"]');
-                if (movieElements.length > 0) {
-                    const movieIndex = Array.from(focusableElements).indexOf(movieElements[0]);
-                    if (movieIndex !== -1) {
-                        currentFocus = movieIndex;
-                        focusableElements[currentFocus].focus();
-                    }
-                }
-            },
-            'series': () => {
-                alert('Series section\n\nThis would integrate with vidfast.net TV series API');
-            },
-            'search': () => {
-                document.querySelector('.search').scrollIntoView();
-                document.getElementById('search-input').focus();
-            }
-        };
-        
-        if (sections[section]) {
-            sections[section]();
-        }
-    }
-
-    // Close video player
-    function closeVideo() {
-        console.log('Closing video player');
-        
+    function closePlayer() {
         const videoContainer = document.getElementById('video-container');
-        const iframe = document.getElementById('stream-iframe');
-        
-        if (iframe) {
-            iframe.src = '';
-        }
-        
         videoContainer.style.display = 'none';
-        
-        // Return focus to the previously focused element
-        if (focusableElements[currentFocus] && !focusableElements[currentFocus].closest('.video-container')) {
-            focusableElements[currentFocus].focus();
-        } else {
-            // Default to first movie item
-            const movieElements = document.querySelectorAll('.movie-item[tabindex="0"]');
-            if (movieElements.length > 0) {
-                movieElements[0].focus();
-            }
-        }
+        videoContainer.innerHTML = '<button class="close-button" id="close-video" tabindex="0" aria-label="Close player">✕ Close</button>';
+        initializeFocus();
     }
 
-    // Go back function for TV remote back button
-    function goBack() {
-        const videoContainer = document.getElementById('video-container');
-        if (videoContainer.style.display === 'block') {
-            closeVideo();
-        } else {
-            // Navigate back to home
-            navigateToSection('home');
-        }
-    }
-
-    // Loading indicator functions
+    // --- Loading Indicator ---
     function showLoading() {
         document.getElementById('loading').style.display = 'block';
-        console.log('Loading...');
     }
-
     function hideLoading() {
         document.getElementById('loading').style.display = 'none';
-        console.log('Loading complete');
     }
 
-    // Add some TV-specific enhancements
-    function addTVEnhancements() {
-        // Disable context menu on right-click (common on TV browsers)
-        document.addEventListener('contextmenu', function(e) {
-            e.preventDefault();
+    // --- Search Functionality ---
+    function setupSearch() {
+        document.getElementById('search-button').addEventListener('click', doSearch);
+        document.getElementById('search-input').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') doSearch();
         });
-        
-        // Add support for TV remote color buttons (if available)
+    }
+    function doSearch() {
+        const term = document.getElementById('search-input').value.trim().toLowerCase();
+        if (!term) return;
+        showLoading();
+        setTimeout(() => {
+            hideLoading();
+            const results = CONTENT.filter(item => item.title.toLowerCase().includes(term) || item.genre.toLowerCase().includes(term) || item.description.toLowerCase().includes(term));
+            if (results.length === 0) {
+                alert('No results found.');
+                return;
+            }
+            // Show results as a temporary category
+            const container = document.getElementById('content-categories');
+            container.innerHTML = `<div class="category-block"><div class="category-title">Search Results</div><div class="category-list">${results.map(item => `<div class=\"movie-item\" tabindex=\"0\" data-movie-id=\"${item.id}\" role=\"listitem\"><div class=\"movie-poster\">${item.poster ? `<img src=\"${item.poster}\" alt=\"${item.title} poster\" style=\"width:100%;height:100%;object-fit:cover;border-radius:12px 12px 0 0;\">` : '🎬'}</div><div class=\"movie-title\">${item.title}</div><div class=\"movie-progress\" style=\"width:${getProgress(item.id) * 100}%;display:${getProgress(item.id) > 0 ? 'block' : 'none'}\"></div></div>`).join('')}</div></div>`;
+            initializeFocus();
+        }, 700);
+    }
+
+    // --- TV Enhancements ---
+    function addTVEnhancements() {
+        document.addEventListener('contextmenu', e => e.preventDefault());
         document.addEventListener('keydown', function(e) {
             switch(e.key) {
-                case 'F1': // Red button
-                case 'Red':
-                    e.preventDefault();
-                    navigateToSection('home');
+                case 'F1': case 'Red':
+                    initializeFocus();
                     break;
-                case 'F2': // Green button  
-                case 'Green':
-                    e.preventDefault();
-                    navigateToSection('movies');
+                case 'F2': case 'Green':
+                    // Focus first movie
+                    const firstMovie = document.querySelector('.movie-item[tabindex="0"]');
+                    if (firstMovie) firstMovie.focus();
                     break;
-                case 'F3': // Yellow button
-                case 'Yellow':
-                    e.preventDefault();
-                    navigateToSection('search');
-                    break;
-                case 'F4': // Blue button
-                case 'Blue':
-                    e.preventDefault();
-                    performSearch();
+                case 'F3': case 'Yellow':
+                    document.getElementById('search-input').focus();
                     break;
             }
         });
     }
 
-    // Initialize TV enhancements
+    // --- Initialize All ---
+    renderHero();
+    renderCategories();
+    initializeFocus();
+    setupNavigation();
+    setupEventDelegation();
+    setupSearch();
     addTVEnhancements();
-    
-    // Debug information
-    console.log('TV Movies Interface loaded successfully');
-    console.log('Movies available:', Object.keys(movies).length);
-    console.log('Focusable elements:', focusableElements.length);
 });
