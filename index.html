@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TV Movies</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <nav class="navbar">
+        <ul>
+            <li><a href="#" tabindex="0" data-section="home">Home</a></li>
+            <li><a href="#" tabindex="0" data-section="movies">Movies</a></li>
+            <li><a href="#" tabindex="0" data-section="series">Series</a></li>
+            <li><a href="#" tabindex="0" data-section="search">Search</a></li>
+        </ul>
+    </nav>
+    
+    <section class="hero">
+        <div class="hero-placeholder">
+            <h1>🎬 FEATURED MOVIE</h1>
+            <p>Action • Adventure • 2024</p>
+        </div>
+    </section>
+    
+    <section class="content-categories">
+        <h2>New Releases</h2>
+        <div class="category-list" id="new-releases">
+            <div class="movie-item" tabindex="0" data-movie-id="1">
+                <div class="movie-placeholder">🎬</div>
+                <div class="movie-title">Action Hero</div>
+            </div>
+            <div class="movie-item" tabindex="0" data-movie-id="2">
+                <div class="movie-placeholder">🗡️</div>
+                <div class="movie-title">Adventure Quest</div>
+            </div>
+            <div class="movie-item" tabindex="0" data-movie-id="3">
+                <div class="movie-placeholder">😂</div>
+                <div class="movie-title">Comedy Gold</div>
+            </div>
+        </div>
+        
+        <h2>Popular Picks</h2>
+        <div class="category-list" id="popular-picks">
+            <div class="movie-item" tabindex="0" data-movie-id="4">
+                <div class="movie-placeholder">🎭</div>
+                <div class="movie-title">Drama Special</div>
+            </div>
+            <div class="movie-item" tabindex="0" data-movie-id="5">
+                <div class="movie-placeholder">🕵️</div>
+                <div class="movie-title">Thriller Night</div>
+            </div>
+            <div class="movie-item" tabindex="0" data-movie-id="6">
+                <div class="movie-placeholder">💕</div>
+                <div class="movie-title">Romance Story</div>
+            </div>
+        </div>
+    </section>
+    
+    <section class="search">
+        <input type="text" id="search-input" placeholder="Find movies or series" tabindex="0">
+        <button id="search-button" tabindex="0">Search</button>
+    </section>
+    
+    <div class="loading" id="loading">Loading movie...</div>
+    
+    <div class="video-container" id="video-container">
+        <button class="close-button" id="close-video" tabindex="0">✕ Close</button>
+        <video class="video-player" id="video-player" controls>
+            <source src="" type="video/mp4">
+            Your browser does not support the video tag.
+        </video>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
